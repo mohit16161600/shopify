@@ -1,0 +1,87 @@
+/* CategorySelector.module.css */
+.h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.categoryContainer {
+
+  background: #fff;
+  padding: 20px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.categoryBoxes {
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 17px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.categoryBox {
+  /* padding: 20px; */
+  /* margin: 20px; */
+  margin: 20px 0px ;
+  background: #f3fff1;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  width: auto;
+  max-width: auto;
+}
+
+.categoryBox:hover {
+  background: #0e5f03;
+  color: #fff;
+  border: 2px solid #fff;
+  transform: scale(1.05);
+}
+
+.categoryImage {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.categoryName {
+  font-size: 11px;
+  color: #4CAF50;
+  text-align: left;
+}
+
+.categoryName:hover {
+  color: #fff;
+}
+
+
+/* Extra small phones */
+@media (max-width: 600px) {
+  .categoryBox {
+    max-width: 110px;
+    padding: 4px;
+  }
+
+  .categoryImage {
+    width: 30px;
+    height: 30px;
+  }
+
+  .categoryName {
+    font-size: 10px;
+  }
+}

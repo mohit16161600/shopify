@@ -1,13 +1,29 @@
-import HeroSection from "@/components/HeroSection";
-import USPSection from "@/components/USPSection";
-import ProductSection from "@/components/ProductSection";
+import TopBanner from "@/app/components/Home/header/TopBanner";
+import MainHeader from "@/app/components/Home/header/MainHeader";
+import HomeHeroSection from "@/app/components/Home/HeroSection";
+import ProductSection from "@/app/components/Home/NewProductSection";
+import CategorySelector from "@/app/components/Home/Category";
+import ConsultationTestimonial from "@/app/components/Home/ConsultationTestimonial";
+import BestSeller from "@/app/components/Home/BestSeller";
+import PowerpackCombo from "@/app/components/Home/PowerpackCombo";
+import WatchAndShop from "@/app/components/Home/youtube/WatchAndShop";
+import EasyShoppingPlatform from "@/app/components/Home/EasyShoppingPlatform";
+import Footer from "@/app/components/Footer";
 
 export default function Home() {
   return (
     <main>
-      <HeroSection />
-      <USPSection />
+      <TopBanner />
+      <MainHeader />
+      <HomeHeroSection />
+      <CategorySelector />
       <ProductSection />
+      <ConsultationTestimonial />
+      <BestSeller />
+      <PowerpackCombo />
+      <WatchAndShop />
+      <EasyShoppingPlatform />
+      <Footer />
     </main>
   );
 }
