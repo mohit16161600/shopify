@@ -14,7 +14,7 @@ export default function ProductSection() {
       </div>
     </section>
     <section className="flex justify-center mt-4 mb-8 ">
-    <button className="bg-gray-950 text-amber-50 hover:bg-green-700 hover:text-white px-2 py-2 rounded-md bg cursor-pointer">View All Products</button>
+    <button className="bg-gray-950 text-white hover:bg-green-700 px-4 md:px-6 py-2 md:py-3 rounded-md cursor-pointer transition font-semibold">View All Products</button>
   </section>
     </div>
   );

@@ -1,0 +1,19 @@
+import Link from 'next/link';
+
+export default function NotFound() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Product Not Found</h1>
+        <p className="text-gray-600 mb-8">The product you're looking for doesn't exist.</p>
+        <Link
+          href="/"
+          className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+        >
+          Go Back Home
+        </Link>
+      </div>
+    </div>
+  );
+}
+

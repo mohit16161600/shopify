@@ -7,6 +7,7 @@ import ConsultationTestimonial from "@/app/components/Home/ConsultationTestimoni
 import BestSeller from "@/app/components/Home/BestSeller";
 import PowerpackCombo from "@/app/components/Home/PowerpackCombo";
 import WatchAndShop from "@/app/components/Home/youtube/WatchAndShop";
+import WhyChooseUs from "@/app/components/Home/WhyChooseUs";
 import EasyShoppingPlatform from "@/app/components/Home/EasyShoppingPlatform";
 import Footer from "@/app/components/Footer";
 
@@ -22,6 +23,7 @@ export default function Home() {
       <BestSeller />
       <PowerpackCombo />
       <WatchAndShop />
+      <WhyChooseUs />
       <EasyShoppingPlatform />
       <Footer />
     </main>
