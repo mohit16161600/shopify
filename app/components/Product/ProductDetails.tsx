@@ -180,7 +180,7 @@ export default function ProductDetails({ product }) {
                         : 'border-gray-300 hover:border-gray-400'
                     }`}
                   >
-                    <div className="text-xs md:text-sm font-medium">{variant.name}</div>
+                    <div className="text-xs md:text-sm font-medium  text-gray-600">{variant.name}</div>
                     <div className="text-xs text-gray-600">
                       ₹{variant.price}
                     </div>
@@ -197,16 +197,16 @@ export default function ProductDetails({ product }) {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg border border-gray-600 text-gray-600 hover:bg-gray-100 flex items-center justify-center"
                 >
                   -
                 </button>
-                <span className="text-xl font-semibold w-12 text-center">
+                <span className="text-xl font-semibold w-12 text-center text-gray-600">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg border border-gray-600 text-gray-600 hover:bg-gray-100 flex items-center justify-center"
                 >
                   +
                 </button>
