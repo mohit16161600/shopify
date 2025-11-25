@@ -3,6 +3,7 @@ import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css'; // Import Swiper's styles
 import styles from '@/app/CategorySelector.module.css'; // Import custom styles
+import Link from 'next/link';
 import { Autoplay } from 'swiper/modules';
 
 const CategorySelector = () => {
@@ -53,14 +54,14 @@ const CategorySelector = () => {
         {/* Map over the categories and render each one inside a SwiperSlide */}
         {categories.map((category, index) => (
           <SwiperSlide key={index}>
-            <div className={styles.categoryBox}>
+            <Link href={`/category/${category.id}`} className={styles.categoryBox}>
               <img
                 src={category.image}
                 alt={category.name}
                 className={styles.categoryImage}
               />
               <p className={styles.categoryName}>{category.name}</p>
-            </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

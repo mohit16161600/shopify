@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import TopBanner from '@/app/components/Home/header/TopBanner';
 import MainHeader from '@/app/components/Home/header/MainHeader';
 import Footer from '@/app/components/Footer';
-import { productDetails } from '@/app/lib/productDetails';
-import { products } from '@/app/lib/newproducts';
+// import { productDetails } from '@/app/lib/productDetails';
+// import { products } from '@/app/lib/newproducts';
 import ProductCard from '@/app/components/Home/ProductCard';
 import { useCart } from '@/app/context/CartContext';
 
@@ -17,7 +17,7 @@ export default function ProductDetails({ product }) {
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -47,6 +47,9 @@ export default function ProductDetails({ product }) {
   };
 
   // Get frequently bought together products
+  // Currently empty in DB, so this will be empty
+  const frequentlyBoughtProducts: any[] = [];
+  /* 
   const frequentlyBoughtProducts = product.frequentlyBoughtTogether
     .map(id => {
       // Try to get from productDetails first, then fallback to products array
@@ -68,6 +71,7 @@ export default function ProductDetails({ product }) {
       return products.find(p => p.id === id);
     })
     .filter(Boolean);
+  */
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -272,72 +276,169 @@ export default function ProductDetails({ product }) {
         </div>
 
         {/* Description */}
-        <div className="bg-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
-          <p className="text-gray-700 leading-relaxed">{product.description}</p>
-        </div>
+        {product.description && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
+            <div className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }} />
+          </div>
+        )}
 
         {/* Key Benefits */}
-        <div className="bg-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Benefits</h2>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {product.keyBenefits.map((benefit, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <span className="text-green-600 mt-1">✓</span>
-                <span className="text-gray-700">{benefit}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* FAQs */}
-        <div className="bg-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {product.faqs.map((faq, index) => (
-              <div key={index} className="border-b border-gray-200 last:border-0 pb-4 last:pb-0">
-                <button
-                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                  className="w-full flex items-center justify-between text-left py-2"
-                >
-                  <span className="font-semibold text-gray-900">{faq.question}</span>
-                  <span className="text-gray-600">
-                    {openFaqIndex === index ? '−' : '+'}
-                  </span>
-                </button>
-                {openFaqIndex === index && (
-                  <p className="text-gray-700 mt-2 pl-4">{faq.answer}</p>
-                )}
-              </div>
-            ))}
+        {product.keyBenefits && product.keyBenefits.length > 0 && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Benefits</h2>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {product.keyBenefits.map((benefit: string, index: number) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span className="text-green-600 mt-1">✓</span>
+                  <span className="text-gray-700" dangerouslySetInnerHTML={{ __html: benefit }} />
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
+        )}
 
-        {/* Testimonials */}
-        <div className="bg-white rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Customer Reviews</h2>
-          <div className="space-y-6">
-            {product.testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="border-b border-gray-200 last:border-0 pb-6 last:pb-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-600 font-semibold">
-                      {testimonial.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <div className="flex items-center gap-2">
-                      {renderStars(testimonial.rating)}
-                      <span className="text-sm text-gray-500">{testimonial.date}</span>
+        {/* Key Ingredients */}
+        {product.keyIngredients && product.keyIngredients.length > 0 && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Key Ingredients</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {product.keyIngredients.map((item: any, index: number) => (
+                <div key={index} className="flex flex-col items-center text-center">
+                  {item.image && (
+                    <div className="w-24 h-24 mb-3 rounded-full overflow-hidden border border-gray-200">
+                      <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <h3 className="font-bold text-lg text-gray-900 mb-1">{item.title}</h3>
+                  <p className="text-sm text-gray-600">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* How to Use */}
+        {product.howToUse && (product.howToUse.steps?.length > 0 || product.howToUse.media) && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{product.howToUse.headline || 'How to Use'}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {product.howToUse.media && (
+                <div className="aspect-video rounded-lg overflow-hidden">
+                  <iframe
+                    src={product.howToUse.media}
+                    title="How to Use"
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              )}
+              <div className="space-y-4">
+                {product.howToUse.steps && product.howToUse.steps.map((step: any, index: number) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold flex-shrink-0">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">{step.title}</h3>
+                      <p className="text-gray-600">{step.description}</p>
                     </div>
                   </div>
-                </div>
-                <p className="text-gray-700 mt-2">{testimonial.text}</p>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Celebrity / Doctor Advice */}
+        {(product.celebrity || product.doctorAdvice) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {product.celebrity && (
+              <div className="bg-white rounded-lg p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{product.celebrity.headline || 'Celebrity Endorsement'}</h2>
+                <div className="aspect-video rounded-lg overflow-hidden mb-4">
+                  <iframe
+                    src={product.celebrity.media}
+                    title={product.celebrity.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <h3 className="font-bold text-lg">{product.celebrity.name}</h3>
+                <p className="text-sm text-gray-500 mb-2">{product.celebrity.profession}</p>
+                <p className="text-gray-700 italic">"{product.celebrity.description}"</p>
+              </div>
+            )}
+            {product.doctorAdvice && (
+              <div className="bg-white rounded-lg p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">{product.doctorAdvice.headline || 'Doctor Advice'}</h2>
+                <div className="aspect-video rounded-lg overflow-hidden mb-4">
+                  <iframe
+                    src={product.doctorAdvice.media}
+                    title="Doctor Advice"
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                {product.doctorAdvice.description && <p className="text-gray-700">{product.doctorAdvice.description}</p>}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* FAQs */}
+        {product.faqs && product.faqs.length > 0 && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {product.faqs.map((faq: any, index: number) => (
+                <div key={index} className="border-b border-gray-200 last:border-0 pb-4 last:pb-0">
+                  <button
+                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                    className="w-full flex items-center justify-between text-left py-2"
+                  >
+                    <span className="font-semibold text-gray-900">{faq.question}</span>
+                    <span className="text-gray-600">
+                      {openFaqIndex === index ? '−' : '+'}
+                    </span>
+                  </button>
+                  {openFaqIndex === index && (
+                    <p className="text-gray-700 mt-2 pl-4">{faq.answer}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Testimonials */}
+        {product.testimonials && product.testimonials.length > 0 && (
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Customer Real Videos</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {product.testimonials.map((testimonial: any, index: number) => (
+                <div key={index} className="aspect-video rounded-lg overflow-hidden">
+                  {testimonial.type === 'youtube' ? (
+                    <iframe
+                      src={testimonial.url.replace('watch?v=', 'embed/')}
+                      title="Customer Review"
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-500">Video Placeholder</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Frequently Bought Together */}
         {frequentlyBoughtProducts.length > 0 && (

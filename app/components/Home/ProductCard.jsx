@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useCart } from '@/app/context/CartContext';
-import { getProductById } from '@/app/lib/productDetails';
 
 export default function ProductCard({ item }) {
   const { addToCart, cartItems } = useCart();
@@ -10,9 +9,9 @@ export default function ProductCard({ item }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const product = getProductById(item.id);
-    if (product && product.variants && product.variants.length > 0) {
-      addToCart(product, product.variants[0], 1);
+
+    if (item.variants && item.variants.length > 0) {
+      addToCart(item, item.variants[0], 1);
     } else {
       // Fallback for products without variants
       const basicVariant = {
@@ -24,6 +23,7 @@ export default function ProductCard({ item }) {
       addToCart(item, basicVariant, 1);
     }
   };
+
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
@@ -88,10 +88,10 @@ export default function ProductCard({ item }) {
 
         {/* Loyalty Reward */}
         <p className="inline-flex items-center gap-2 mb-4 text-xs font-bold text-[#8A6E1A] 
-     bg-[#FFF8E7] px-4 py-1.5 rounded-full border border-[#E8CF68] shadow-[0_2px_6px_rgba(232,207,104,0.5)]">
+       bg-[#FFF8E7] px-4 py-1.5 rounded-full border border-[#E8CF68] shadow-[0_2px_6px_rgba(232,207,104,0.5)]">
 
           <span className="w-6 h-6 bg-gradient-to-br from-[#FFE58A] to-[#E8CF68] 
-        rounded-full shadow-inner flex items-center justify-center text-lg">
+          rounded-full shadow-inner flex items-center justify-center text-lg">
             🪙
           </span>
 

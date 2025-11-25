@@ -7,9 +7,9 @@ import TopBanner from '@/app/components/Home/header/TopBanner';
 import MainHeader from '@/app/components/Home/header/MainHeader';
 import Footer from '@/app/components/Footer';
 import ProductCard from '@/app/components/Home/ProductCard';
-import { products as newProducts } from '@/app/lib/newproducts';
-import { products as bestSellerProducts } from '@/app/lib/bestseller';
-import { products as powerpackProducts } from '@/app/lib/powerpackcombo';
+// import { products as newProducts } from '@/app/lib/newproducts';
+// import { products as bestSellerProducts } from '@/app/lib/bestseller';
+// import { products as powerpackProducts } from '@/app/lib/powerpackcombo';
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -17,8 +17,26 @@ function SearchContent() {
   const query = searchParams.get('q') || '';
   const [searchResults, setSearchResults] = useState<any[]>([]);
 
-  // Combine all products
-  const allProducts = [...newProducts, ...bestSellerProducts, ...powerpackProducts];
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        if (response.ok) {
+          const data = await response.json();
+          setAllProducts(data);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Levenshtein distance for fuzzy search
   const levenshteinDistance = (a: string, b: string) => {
@@ -55,6 +73,8 @@ function SearchContent() {
   };
 
   useEffect(() => {
+    if (loading) return;
+
     if (query.trim()) {
       const lowerQuery = query.toLowerCase().trim();
       const results = allProducts.filter(product => {
@@ -80,7 +100,7 @@ function SearchContent() {
     } else {
       setSearchResults([]);
     }
-  }, [query]);
+  }, [query, allProducts, loading]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -90,46 +110,55 @@ function SearchContent() {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Search Products</h1>
 
-        {/* Search Results */}
-        {query.trim() && (
-          <div>
-            <p className="text-gray-700 mb-4">
-              {searchResults.length > 0
-                ? `Found ${searchResults.length} product${searchResults.length !== 1 ? 's' : ''} for "${query}"`
-                : `No products found for "${query}"`
-              }
-            </p>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          </div>
+        ) : (
+          <>
 
-            {searchResults.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {searchResults.map((product) => (
-                  <ProductCard key={product.id} item={product} />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg p-8 text-center">
-                <p className="text-gray-600 text-lg mb-4">No products match your search.</p>
-                <Link
-                  href="/"
-                  className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition"
-                >
-                  Continue Shopping
-                </Link>
+            {/* Search Results */}
+            {query.trim() && (
+              <div>
+                <p className="text-gray-700 mb-4">
+                  {searchResults.length > 0
+                    ? `Found ${searchResults.length} product${searchResults.length !== 1 ? 's' : ''} for "${query}"`
+                    : `No products found for "${query}"`
+                  }
+                </p>
+
+                {searchResults.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {searchResults.map((product) => (
+                      <ProductCard key={product.id} item={product} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg p-8 text-center">
+                    <p className="text-gray-600 text-lg mb-4">No products match your search.</p>
+                    <Link
+                      href="/"
+                      className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+                    >
+                      Continue Shopping
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        {/* Show all products if no search query */}
-        {!query.trim() && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">All Products</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {allProducts.map((product) => (
-                <ProductCard key={product.id} item={product} />
-              ))}
-            </div>
-          </div>
+            {/* Show all products if no search query */}
+            {!query.trim() && (
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-4">All Products</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {allProducts.map((product) => (
+                    <ProductCard key={product.id} item={product} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

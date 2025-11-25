@@ -5,13 +5,30 @@ import TopBanner from "@/app/components/Home/header/TopBanner";
 import MainHeader from "@/app/components/Home/header/MainHeader";
 import Footer from "@/app/components/Footer";
 import ProductCard from "@/app/components/Home/ProductCard";
-import { products } from "@/app/lib/bestseller";
+// import { products } from "@/app/lib/bestseller";
 
 export default function TrackOrderPage() {
     const [awb, setAwb] = useState('');
     const [isTracking, setIsTracking] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const [isPaused, setIsPaused] = useState(false);
+    const [products, setProducts] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await fetch('/api/products?category=Best%20Sellers');
+                if (response.ok) {
+                    const data = await response.json();
+                    setProducts(data);
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     useEffect(() => {
         const scrollContainer = scrollRef.current;

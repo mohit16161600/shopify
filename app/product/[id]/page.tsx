@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import ProductDetails from '@/app/components/Product/ProductDetails';
-import { getProductById } from '@/app/lib/productDetails';
+import { getProduct } from '@/app/lib/products';
 
 export async function generateStaticParams() {
   // Generate static params for all products
@@ -22,7 +22,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
-  const product = getProductById(productId);
+  const product = await getProduct(productId);
 
   if (!product) {
     notFound();
