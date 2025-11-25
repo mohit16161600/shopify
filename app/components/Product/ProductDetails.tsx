@@ -13,7 +13,7 @@ import { useCart } from '@/app/context/CartContext';
 
 export default function ProductDetails({ product }) {
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -23,7 +23,7 @@ export default function ProductDetails({ product }) {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 >= 0.5;
     const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-    
+
     return (
       <div className="flex items-center gap-0.5">
         {[...Array(fullStars)].map((_, i) => (
@@ -39,7 +39,6 @@ export default function ProductDetails({ product }) {
 
   const handleAddToCart = () => {
     addToCart(product, selectedVariant, quantity);
-    alert('Product added to cart!');
   };
 
   const handleBuyNow = () => {
@@ -74,7 +73,7 @@ export default function ProductDetails({ product }) {
     <div className="min-h-screen bg-gray-50">
       <TopBanner />
       <MainHeader />
-      
+
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-3">
@@ -98,18 +97,17 @@ export default function ProductDetails({ product }) {
                 className="w-full h-full object-contain"
               />
             </div>
-            
+
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2">
               {product.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
-                    selectedImageIndex === index
-                      ? 'border-green-600'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${selectedImageIndex === index
+                    ? 'border-green-600'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <img
                     src={image}
@@ -166,26 +164,52 @@ export default function ProductDetails({ product }) {
               <label className="block text-sm font-semibold text-gray-700">
                 Select Package:
               </label>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                {product.variants.map((variant) => (
-                  <button
-                    key={variant.id}
-                    onClick={() => {
-                      setSelectedVariant(variant);
-                      setQuantity(1);
-                    }}
-                    className={`px-3 md:px-4 py-2 rounded-lg border-2 transition text-left ${
-                      selectedVariant.id === variant.id
-                        ? 'border-green-600 bg-green-50 text-green-700'
-                        : 'border-gray-300 hover:border-gray-400'
-                    }`}
-                  >
-                    <div className="text-xs md:text-sm font-medium  text-gray-600">{variant.name}</div>
-                    <div className="text-xs text-gray-600">
-                      ₹{variant.price}
-                    </div>
-                  </button>
-                ))}
+              <div className="flex flex-col gap-3">
+                {product.variants.map((variant) => {
+                  const discountPercentage = Math.round(((variant.originalPrice - variant.price) / variant.originalPrice) * 100);
+                  const coins = Math.round(variant.price * 0.05);
+                  const months = parseInt(variant.name) || 1;
+
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => {
+                        setSelectedVariant(variant);
+                        setQuantity(1);
+                      }}
+                      className={`w-full flex items-center p-3 rounded-lg border transition-all ${selectedVariant.id === variant.id
+                        ? 'border-green-600 bg-green-50'
+                        : 'border-gray-300 hover:border-gray-400 bg-white'
+                        }`}
+                    >
+                      {/* Radio Circle */}
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedVariant.id === variant.id
+                        ? 'border-green-600'
+                        : 'border-gray-400'
+                        }`}>
+                        {selectedVariant.id === variant.id && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-green-600" />
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 text-left text-sm md:text-base text-gray-700">
+                        <span>
+                          {months} {months > 1 ? 'months' : 'month'} ({months} {months > 1 ? 'Units' : 'Unit'}):
+                        </span>
+                        <span className="font-bold mx-1">
+                          ₹{variant.price.toLocaleString()}
+                        </span>
+                        <span className="text-green-600 font-medium">
+                          @{discountPercentage}% off
+                        </span>
+                        <span className="text-gray-600 ml-1">
+                          {' '}[Get {coins} Sheopals Coins]
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -216,14 +240,14 @@ export default function ProductDetails({ product }) {
             {/* Loyalty Coins */}
             <div className="inline-flex items-center gap-2 text-sm font-bold text-[#8A6E1A] bg-[#FFF8E7] px-4 py-2 rounded-full border border-[#E8CF68]">
               <span className="text-lg">🪙</span>
-              <span>Earn {product.loyaltyCoins * quantity} Coins</span>
+              <span>Earn {Math.round(selectedVariant.price * 0.05) * quantity} Sheopals Coins</span>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-4">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 md:py-4 px-4 md:px-6 rounded-lg transition flex items-center justify-center gap-2 text-sm md:text-base"
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 md:py-4 px-4 md:px-6 rounded-lg transition flex items-center justify-center gap-2 text-sm md:text-base relative"
               >
                 <img
                   src="/image/shopping-cart.png"
@@ -231,6 +255,11 @@ export default function ProductDetails({ product }) {
                   className="w-5 h-5 md:w-6 md:h-6"
                 />
                 Add to Cart
+                {cartItems.find(item => item.productId === product.id && item.variant.id === selectedVariant.id)?.quantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                    {cartItems.find(item => item.productId === product.id && item.variant.id === selectedVariant.id)?.quantity}
+                  </span>
+                )}
               </button>
               <button
                 onClick={handleBuyNow}
@@ -322,7 +351,7 @@ export default function ProductDetails({ product }) {
           </div>
         )}
       </div>
-      
+
       <Footer />
     </div>
   );

@@ -1,6 +1,6 @@
 export const products = [
   {
-    id: 1,
+    id: 9,
     name: "I2 Immunity Increaser & Moringa Leaf Powder to booster Immunity",
     brand: "Sheopals",
     price: 1030,
@@ -12,7 +12,7 @@ export const products = [
     image: "/image/moringa_powder_and_i2_Immunity.webp"
   },
   {
-    id: 2,
+    id: 10,
     name: "Herb69 Tablet and Herb69 Oil Combo",
     brand: "Sheopals",
     price: 1030,
@@ -24,7 +24,7 @@ export const products = [
     image: "/image/Herb_69_Combo_copy.webp"
   },
   {
-    id: 3,
+    id: 11,
     name: "Mool Hair Growth Oil and Capsule Combo with Amla Sheopals Mool Hair Growth Oil and Capsule For Strong & Healthy Hair Growth",
     brand: "Sheopals",
     price: 1200,
@@ -36,7 +36,7 @@ export const products = [
     image: "/image/Mool_Hair_and_Caps.webp"
   },
   {
-    id: 4,
+    id: 12,
     name: "Pilohem: Best Ayurvedic Capsule and Oil for Piles Sheopals Pilohem: Best Ayurvedic Capsule and Oil for Piles",
     brand: "Sheopals",
     price: 1029,

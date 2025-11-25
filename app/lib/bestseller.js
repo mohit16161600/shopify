@@ -1,6 +1,6 @@
 export const products = [
   {
-    id: 1,
+    id: 5,
     name: "Beard Serum With Redensyl For Beard Growth",
     brand: "Sheopals",
     price: 1030,
@@ -12,7 +12,7 @@ export const products = [
     image: "/image/beard_serum_6.webp"
   },
   {
-    id: 2,
+    id: 6,
     name: "Sheopals Slimo Advance Weight loss Capsules – Ayurvedic Weight Loss Medicine",
     brand: "Sheopals",
     price: 1030,
@@ -24,7 +24,7 @@ export const products = [
     image: "/image/slimo_webp.webp"
   },
   {
-    id: 3,
+    id: 7,
     name: "LiverX Factor: Detox Your Liver With Liver Care Capsule",
     brand: "Sheopals",
     price: 1200,
@@ -36,7 +36,7 @@ export const products = [
     image: "/image/Liver_X_Factor_Caps.webp"
   },
   {
-    id: 4,
+    id: 8,
     name: "Sheopal's Diabdex: Herbal Diabetes Capsule for Blood Sugar Control",
     brand: "Sheopals",
     price: 1029,

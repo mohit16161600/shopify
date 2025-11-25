@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import TopBanner from '@/app/components/Home/header/TopBanner';
@@ -27,13 +27,7 @@ type AppliedCoupon = CouponType & {
   code: string;
 };
 
-// Coupon codes - can be moved to a database or API
-const COUPONS: { [key: string]: CouponType } = {
-  'SAVE10': { discount: 10, type: 'percent' }, // 10% discount
-  'SAVE20': { discount: 20, type: 'percent' }, // 20% discount
-  'FLAT100': { discount: 100, type: 'fixed' }, // ₹100 flat discount
-  'WELCOME': { discount: 15, type: 'percent' }, // 15% discount
-};
+
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -43,6 +37,8 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponError, setCouponError] = useState('');
   const [itemToRemove, setItemToRemove] = useState<string | null>(null);
+  const [coupons, setCoupons] = useState<{ [key: string]: CouponType }>({});
+  const [couponsLoading, setCouponsLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -55,6 +51,27 @@ export default function CheckoutPage() {
     paymentMethod: 'cod'
   });
 
+  // Fetch coupons from API on component mount
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const response = await fetch('/api/coupon');
+        if (response.ok) {
+          const data = await response.json();
+          setCoupons(data);
+        } else {
+          console.error('Failed to fetch coupons');
+        }
+      } catch (error) {
+        console.error('Error fetching coupons:', error);
+      } finally {
+        setCouponsLoading(false);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -65,14 +82,14 @@ export default function CheckoutPage() {
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     const code = couponCode.toUpperCase().trim();
-    
+
     if (!code) {
       setCouponError('Please enter a coupon code');
       return;
     }
 
-    if (COUPONS[code]) {
-      setAppliedCoupon({ code, ...COUPONS[code] });
+    if (coupons[code]) {
+      setAppliedCoupon({ code, ...coupons[code] });
       setCouponError('');
       setCouponCode('');
     } else {
@@ -118,12 +135,12 @@ export default function CheckoutPage() {
       customer: formData,
       appliedCoupon: appliedCoupon?.code || null
     };
-    
+
     console.log('Order placed:', orderData);
-    
+
     setOrderPlaced(true);
     clearCart();
-    
+
     // Redirect to order confirmation after 3 seconds
     setTimeout(() => {
       router.push('/');
@@ -133,30 +150,30 @@ export default function CheckoutPage() {
   // Calculate discounts and totals
   const subtotal = getCartTotal();
   const shipping = subtotal > PAYMENT_CONFIG.freeShippingThreshold ? 0 : PAYMENT_CONFIG.shippingCharge;
-  
+
   // Calculate coupon discount
   const calculateCouponDiscount = () => {
     if (!appliedCoupon) return 0;
-    
+
     if (appliedCoupon.type === 'percent') {
       return (subtotal * appliedCoupon.discount) / 100;
     } else {
       return Math.min(appliedCoupon.discount, subtotal); // Fixed discount, but not more than subtotal
     }
   };
-  
+
   const couponDiscount = calculateCouponDiscount();
   const subtotalAfterCoupon = subtotal - couponDiscount;
-  
+
   // Calculate payment method discount (15% for online payment)
-  const paymentMethodDiscount = formData.paymentMethod === 'online' 
-    ? (subtotalAfterCoupon * PAYMENT_CONFIG.onlineDiscountPercent) / 100 
+  const paymentMethodDiscount = formData.paymentMethod === 'online'
+    ? (subtotalAfterCoupon * PAYMENT_CONFIG.onlineDiscountPercent) / 100
     : 0;
-  
+
   const subtotalAfterDiscounts = subtotalAfterCoupon - paymentMethodDiscount;
   const tax = subtotalAfterDiscounts * (PAYMENT_CONFIG.taxPercent / 100);
   const finalTotal = Math.round(subtotalAfterDiscounts + shipping + tax);
- 
+
 
   // Get payment amount based on payment method
   const getPaymentAmount = () => {
@@ -223,7 +240,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-gray-50">
       <TopBanner />
       <MainHeader />
-      
+
       <div className="container mx-auto px-4 py-4 md:py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-8">Checkout</h1>
 
@@ -232,7 +249,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-1 order-2 lg:order-1">
             <div className="bg-white rounded-lg p-4 md:p-6 shadow-sm lg:sticky lg:top-4">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
-              
+
               <div className="space-y-4 mb-6">
                 {cartItems.map((item: any) => (
                   <div key={item.id} className="flex gap-4 pb-4 border-b">
@@ -318,21 +335,21 @@ export default function CheckoutPage() {
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-semibold text-gray-800">₹{subtotal.toFixed(2)}</span>
                 </div>
-                
+
                 {couponDiscount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Coupon Discount ({appliedCoupon?.code})</span>
                     <span className="font-semibold">-₹{couponDiscount.toFixed(2)}</span>
                   </div>
                 )}
-                
+
                 {paymentMethodDiscount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Online Payment Discount ({PAYMENT_CONFIG.onlineDiscountPercent}%)</span>
                     <span className="font-semibold">-₹{paymentMethodDiscount.toFixed(2)}</span>
                   </div>
                 )}
-                
+
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
                   <span className="font-semibold text-gray-800">{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
@@ -345,7 +362,7 @@ export default function CheckoutPage() {
                   <span className="font-bold text-lg text-gray-500">Total</span>
                   <span className="font-bold text-lg text-gray-800">₹{finalTotal.toFixed(2)}</span>
                 </div>
-                
+
                 {formData.paymentMethod === 'partial' && (
                   <div className="mt-3 pt-3 border-t">
                     <div className="flex justify-between text-sm mb-1">
@@ -368,7 +385,7 @@ export default function CheckoutPage() {
               {/* Shipping Information */}
               <div className="bg-white rounded-lg p-4 md:p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -546,13 +563,13 @@ export default function CheckoutPage() {
                   formData.paymentMethod === "partial"
                     ? `Pay ₹${getPaymentAmount().toFixed(2)} Now - Place Order`
                     : formData.paymentMethod === "cod"
-                    ? "Order Now"
-                    : formData.paymentMethod === "online"
-                    ? `Pay Now - ₹${getPaymentAmount().toFixed(2)}`
-                    : ""
+                      ? "Place Order"
+                      : formData.paymentMethod === "online"
+                        ? `Pay Now - ₹${getPaymentAmount().toFixed(2)}`
+                        : ""
                 }
 
-                
+
               </button>
             </form>
           </div>

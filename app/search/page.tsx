@@ -14,69 +14,92 @@ import { products as powerpackProducts } from '@/app/lib/powerpackcombo';
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [searchResults, setSearchResults] = useState([]);
+  const query = searchParams.get('q') || '';
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
   // Combine all products
   const allProducts = [...newProducts, ...bestSellerProducts, ...powerpackProducts];
 
+  // Levenshtein distance for fuzzy search
+  const levenshteinDistance = (a: string, b: string) => {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+
+    const matrix = [];
+
+    for (let i = 0; i <= b.length; i++) {
+      matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= a.length; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+      for (let j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1, // substitution
+            Math.min(
+              matrix[i][j - 1] + 1, // insertion
+              matrix[i - 1][j] + 1 // deletion
+            )
+          );
+        }
+      }
+    }
+
+    return matrix[b.length][a.length];
+  };
+
   useEffect(() => {
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      const results = allProducts.filter(product => 
-        product.name.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query)
-      );
+    if (query.trim()) {
+      const lowerQuery = query.toLowerCase().trim();
+      const results = allProducts.filter(product => {
+        const name = product.name.toLowerCase();
+        const brand = product.brand.toLowerCase();
+
+        // Exact partial match (existing logic)
+        if (name.includes(lowerQuery) || brand.includes(lowerQuery)) {
+          return true;
+        }
+
+        // Fuzzy match
+        // Split product name into words to check against query
+        const words = [...name.split(' '), ...brand.split(' ')];
+        return words.some(word => {
+          const distance = levenshteinDistance(lowerQuery, word);
+          // Allow max 3 edits, or fewer for short words
+          const maxEdits = Math.min(3, Math.floor(word.length / 2));
+          return distance <= maxEdits;
+        });
+      });
       setSearchResults(results);
     } else {
       setSearchResults([]);
     }
-  }, [searchQuery]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  }, [query]);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBanner />
       <MainHeader />
-      
+
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Search Products</h1>
-        
-        {/* Search Form */}
-        <form onSubmit={handleSearch} className="mb-8">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for products..."
-              className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-500 text-base"
-            />
-            <button
-              type="submit"
-              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition"
-            >
-              Search
-            </button>
-          </div>
-        </form>
 
         {/* Search Results */}
-        {searchQuery.trim() && (
+        {query.trim() && (
           <div>
             <p className="text-gray-700 mb-4">
-              {searchResults.length > 0 
-                ? `Found ${searchResults.length} product${searchResults.length !== 1 ? 's' : ''} for "${searchQuery}"`
-                : `No products found for "${searchQuery}"`
+              {searchResults.length > 0
+                ? `Found ${searchResults.length} product${searchResults.length !== 1 ? 's' : ''} for "${query}"`
+                : `No products found for "${query}"`
               }
             </p>
-            
+
             {searchResults.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {searchResults.map((product) => (
@@ -98,7 +121,7 @@ function SearchContent() {
         )}
 
         {/* Show all products if no search query */}
-        {!searchQuery.trim() && (
+        {!query.trim() && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-4">All Products</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
