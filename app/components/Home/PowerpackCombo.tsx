@@ -28,7 +28,7 @@ export default function ProductSection() {
         <h2 className="text-2xl font-bold  text-gray-900">Powerpack Combo</h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
-          {products.map((p: any) => (
+          {products.slice(0, 4).map((p: any) => (
             <ProductCard key={p.id} item={p} />
           ))}
         </div>

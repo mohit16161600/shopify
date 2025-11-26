@@ -37,12 +37,12 @@ export default function LoginPage() {
       return;
     }
 
-    const success = await login(formData.email, formData.password);
+    const { success, error: loginError } = await login(formData.email, formData.password);
 
     if (success) {
       router.push('/profile');
     } else {
-      setError('Invalid email or password');
+      setError(loginError || 'Invalid email or password');
     }
 
     setLoading(false);
@@ -52,7 +52,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50">
       <TopBanner />
       <MainHeader />
-      
+
       <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
