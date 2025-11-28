@@ -75,7 +75,7 @@ export default function MainHeader() {
         </Link> */}
 
       {/* User Menu */}
-      <div className="relative order-6 flex-shrink-0" ref={menuRef}>
+      <div className="relative order-6 flex-shrink-0 z-500" ref={menuRef}>
         {isAuthenticated ? (
           <div className="relative">
             <button

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { testimonials } from '@/app/lib/testimonials';
 
 export default function ConsultationTestimonial() {
@@ -31,9 +32,9 @@ export default function ConsultationTestimonial() {
               </p>
             </div>
             <div className="mt-6">
-              <button className="bg-white text-green-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">
+              <Link href="/consultation" className="inline-block bg-white text-green-700 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">
                 Book Now
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -47,15 +48,14 @@ export default function ConsultationTestimonial() {
                 {currentTestimonial.name}
               </p>
             </div>
-            
+
             {/* Pagination Dots */}
             <div className="flex justify-center gap-2 mt-6">
               {testimonials.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentIndex ? 'bg-green-600' : 'bg-gray-300'
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-green-600' : 'bg-gray-300'
+                    }`}
                 />
               ))}
             </div>

@@ -9,6 +9,8 @@ import PowerpackCombo from "@/app/components/Home/PowerpackCombo";
 import WatchAndShop from "@/app/components/Home/youtube/WatchAndShop";
 import WhyChooseUs from "@/app/components/Home/WhyChooseUs";
 import EasyShoppingPlatform from "@/app/components/Home/EasyShoppingPlatform";
+import CustomerReviews from "@/app/components/Home/CustomerReviews";
+import InstagramFeed from "@/app/components/Home/InstagramFeed";
 import Footer from "@/app/components/Footer";
 
 export default function Home() {
@@ -25,6 +27,8 @@ export default function Home() {
       <WatchAndShop />
       <WhyChooseUs />
       <EasyShoppingPlatform />
+      <CustomerReviews />
+      <InstagramFeed />
       <Footer />
     </main>
   );
