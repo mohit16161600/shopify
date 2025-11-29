@@ -99,7 +99,7 @@ export default function CustomerReviews() {
                                 className="flex-shrink-0 w-[300px] md:w-[350px] bg-green-50 rounded-xl p-6 relative mt-12 snap-center"
                             >
                                 {/* Product Image Circle */}
-                                <div className="absolute -top-10 right-6 w-20 h-20 rounded-full bg-white p-2 shadow-md flex items-center justify-center border border-gray-100">
+                                <div className="absolute -top-10 right-6 w-25 h-25 rounded-full bg-white p-1 flex items-center justify-center ">
                                     <div className="relative w-full h-full rounded-full overflow-hidden">
                                         {/* Fallback for image if path is placeholder */}
                                         <Image

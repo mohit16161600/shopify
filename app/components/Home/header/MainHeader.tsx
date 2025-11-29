@@ -12,6 +12,8 @@ export default function MainHeader() {
   const router = useRouter();
   const cartCount = getCartCount();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -47,24 +49,73 @@ export default function MainHeader() {
 
       {/* search bar at center - hidden on mobile, shown on tablet+ */}
       {/* search bar at center - visible on all screens */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          const query = formData.get('q');
-          if (query && query.trim()) {
-            router.push(`/search?q=${encodeURIComponent(query.trim())}`);
-          }
-        }}
-        className="flex items-center justify-end grow mx-2 md:mx-4 order-last md:order-2 w-full md:w-auto mt-2 md:mt-0"
-      >
-        <input
-          type="text"
-          name="q"
-          placeholder="Search products..."
-          className="w-full h-10 rounded-md border-2 border-gray-300 px-4 text-base text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-        />
-      </form>
+      <div className="relative flex items-center justify-end grow mx-2 md:mx-4 order-last md:order-2 w-full md:w-auto mt-2 md:mt-0">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target as HTMLFormElement);
+            const query = formData.get('q') as string;
+            if (query && query.trim()) {
+              setShowSuggestions(false);
+              router.push(`/search?q=${encodeURIComponent(query.trim())}`);
+            }
+          }}
+          className="w-full"
+        >
+          <input
+            type="text"
+            name="q"
+            placeholder="Search products..."
+            autoComplete="off"
+            className="w-full h-10 rounded-md border-2 border-gray-300 px-4 text-base text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            onChange={async (e) => {
+              const val = e.target.value;
+              if (val.length >= 2) {
+                try {
+                  const res = await fetch(`/api/suggestions?q=${encodeURIComponent(val)}`);
+                  if (res.ok) {
+                    const data = await res.json();
+                    setSuggestions(data);
+                    setShowSuggestions(true);
+                  }
+                } catch (err) {
+                  console.error(err);
+                }
+              } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+              }
+            }}
+            onBlur={() => {
+              // Delay hiding to allow click on suggestion
+              setTimeout(() => setShowSuggestions(false), 200);
+            }}
+            onFocus={(e) => {
+              if (e.target.value.length >= 2 && suggestions.length > 0) {
+                setShowSuggestions(true);
+              }
+            }}
+          />
+        </form>
+
+        {/* Suggestions Dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-b-md shadow-lg z-50 mt-1">
+            {suggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800 text-sm"
+                onClick={() => {
+                  router.push(`/search?q=${encodeURIComponent(suggestion)}`);
+                  setShowSuggestions(false);
+                }}
+              >
+                {suggestion}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* <div className="hidden lg:flex items-center justify-end">
         <button className="bg-green-900 text-white px-3 md:px-4 py-1.5 md:py-2 rounded-md text-sm md:text-base">Get App</button>

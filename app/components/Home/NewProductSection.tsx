@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductCard from "./ProductCard";
+import Link from 'next/link';
 
 export default function ProductSection() {
   const [products, setProducts] = useState([]);
@@ -34,7 +35,9 @@ export default function ProductSection() {
         </div>
       </section>
       <section className="flex justify-center mt-4 mb-8 ">
-        <button className="bg-gray-950 text-white hover:bg-green-700 px-4 md:px-6 py-2 md:py-3 rounded-md cursor-pointer transition font-semibold">View All Products</button>
+        <Link href="/category?view_category=New%20Launches">
+          <button className="bg-gray-950 text-white hover:bg-green-700 px-4 md:px-6 py-2 md:py-3 rounded-md cursor-pointer transition font-semibold">View All Products</button>
+        </Link>
       </section>
     </div>
   );

@@ -1,45 +1,19 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/app/lib/db';
-import { getProduct } from '@/app/lib/products';
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const id = searchParams.get('id');
-        const category = searchParams.get('category');
-        const categoryId = searchParams.get('categoryId');
-        const ids = searchParams.get('ids');
+        const queryText = searchParams.get('q');
 
-        if (id) {
-            const product = await getProduct(parseInt(id));
-            if (!product) {
-                return NextResponse.json({ message: 'Product not found' }, { status: 404 });
-            }
-            return NextResponse.json(product);
+        if (!queryText) {
+            return NextResponse.json([]);
         }
 
-        let sql = 'SELECT id, title, vendor, rating, variants, prefrence, image, images, view_category FROM products';
-        const params: any[] = [];
-
-        if (category) {
-            sql += ' WHERE view_category = ?';
-            params.push(category);
-        } else if (categoryId) {
-            sql += ' WHERE category_id = ?';
-            params.push(categoryId);
-        } else if (ids) {
-            const idList = ids.split(',').map(id => id.trim());
-            if (idList.length > 0) {
-                // Create placeholders based on the number of IDs
-                const placeholders = idList.map(() => '?').join(',');
-                sql += ` WHERE id IN (${placeholders})`;
-                params.push(...idList);
-            }
-        }
-
-        console.log('Executing product query:', sql, params);
-        const results = await query(sql, params);
-        console.log('Query results count:', Array.isArray(results) ? results.length : 0);
+        console.log('Searching products for:', queryText);
+        const likeQuery = `%${queryText}%`;
+        const results = await query('SELECT * FROM products WHERE title LIKE ? OR vendor LIKE ?', [likeQuery, likeQuery]) as any[];
+        console.log('Found products:', results.length);
 
         const products = Array.isArray(results) ? results.map((row: any) => {
             let price = 0;
@@ -82,7 +56,7 @@ export async function GET(request: Request) {
                 originalPrice: originalPrice,
                 discount: discount,
                 rating: row.rating || 0,
-                reviews: 0, // Not available in DB yet
+                reviews: 0,
                 loyaltyCoins: parseInt(row.prefrence || '0'),
                 image: image,
                 category: row.view_category,
@@ -97,10 +71,6 @@ export async function GET(request: Request) {
 
         return NextResponse.json(products);
     } catch (error: any) {
-        console.error('Database error fetching products:', error);
-        return NextResponse.json(
-            { message: 'Failed to fetch products', error: error.message },
-            { status: 500 }
-        );
+        return NextResponse.json({ message: 'Failed to fetch products', error: error.message }, { status: 500 });
     }
 }

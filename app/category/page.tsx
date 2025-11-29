@@ -7,34 +7,35 @@ import MainHeader from '@/app/components/Home/header/MainHeader';
 import Footer from '@/app/components/Footer';
 import ProductCard from '@/app/components/Home/ProductCard';
 
-function SearchContent() {
+function CategoryContent() {
     const searchParams = useSearchParams();
-    const query = searchParams.get('q');
+    const viewCategory = searchParams.get('view_category');
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProducts = async () => {
-            if (!query) {
+            if (!viewCategory) {
                 setLoading(false);
                 return;
             }
 
             try {
-                const response = await fetch(`/api/text-search?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/api/auth/search?view_category=${encodeURIComponent(viewCategory)}`);
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Fetched products:', data);
                     setProducts(data);
                 }
             } catch (error) {
-                console.error('Error fetching search results:', error);
+                console.error('Error fetching products:', error);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchProducts();
-    }, [query]);
+    }, [viewCategory]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -43,7 +44,7 @@ function SearchContent() {
 
             <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-                    {query ? `Search Results for "${query}"` : 'Search'}
+                    {viewCategory ? viewCategory : 'Products'}
                 </h1>
 
                 {loading ? (
@@ -60,7 +61,7 @@ function SearchContent() {
                             </div>
                         ) : (
                             <div className="bg-white rounded-lg p-8 text-center">
-                                <p className="text-gray-600 text-lg mb-4">No products found matching your search.</p>
+                                <p className="text-gray-600 text-lg mb-4">No products found in this category.</p>
                             </div>
                         )}
                     </>
@@ -72,10 +73,10 @@ function SearchContent() {
     );
 }
 
-export default function SearchPage() {
+export default function CategoryPage() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <SearchContent />
+            <CategoryContent />
         </Suspense>
     );
 }
